@@ -3,11 +3,18 @@ package com.tacklind.blake.mytest;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 public class TestingZone extends ActionBarActivity {
@@ -22,8 +29,35 @@ public class TestingZone extends ActionBarActivity {
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                String TAG = "Test";
+                Log.v(TAG, "Stage 1");
+                try {
+                    Class.forName("org.postgresql.Driver");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                Log.v(TAG, "Stage 2");
+                String  url ;
+                url = "jdbc:postgresql://sernity.isozill.com:5432/parcelexchange" +
+                        "?sslfactory=org.postgresql.ssl.NonValidatingFactory" +
+                        "&ssl=true";
+                Connection conn = null;
+                Log.v(TAG, "Stage 3");
+                try {
+                    conn = DriverManager. getConnection(url, "ParcelExchange", "Mabc0NDkYRf1yVyIfhRd");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                Log.v(TAG, "Stage 4");
 
-
+                if(conn!=null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.v(TAG, "Stage 5");
             }
         });
 
