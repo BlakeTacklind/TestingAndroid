@@ -1,0 +1,4 @@
+<classpath>
+	<classpathentry kind="lib"
+		path="/app/libs/postgresql-9.4-1201.jdbc4.jar" />
+</classpath>
