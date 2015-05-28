@@ -45,8 +45,9 @@ public class TestingZone extends ActionBarActivity {
                 }
                 //Log.v(TAG, "Stage 2");
 
-                DataBaseWarper.getUsers();
-                DataBaseWarper.addUser("Joe");
+                DataBaseWarper.checkUserExistance("HAHA");
+                //DataBaseWarper.getUsers();
+                //DataBaseWarper.addUser("Joe");
             }
         });
 
@@ -57,6 +58,12 @@ public class TestingZone extends ActionBarActivity {
         final private static String url = "jdbc:postgresql://serenity.isozilla.com:5432/" +
                 "parcelexchange?sslfactory=org.postgresql.ssl.NonValidatingFactory" +
                 "&ssl=true";
+
+        public static void checkUserExistance(String name){
+            new get().execute(new getStrings("users", "username", "username = '" + name + "';"));
+        }
+
+
 
         public static void getUsers(){
             new get().execute(new getStrings("users", "username"));
@@ -136,8 +143,6 @@ public class TestingZone extends ActionBarActivity {
             }
         }
 
-
-
         protected static void insertINTO (Connection conn, String table, String column, String values){
             final String TAG = "insertINTO";
 
@@ -171,7 +176,7 @@ public class TestingZone extends ActionBarActivity {
             String sql;
             sql = "SELECT " + column + " FROM " + table;
             if (extra != "")
-                sql += " " + extra;
+                sql += " WHERE " + extra;
 
             ArrayList<String> res = new ArrayList<String>();
             Statement st = null;
