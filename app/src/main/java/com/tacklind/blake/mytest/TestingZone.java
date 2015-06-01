@@ -45,19 +45,112 @@ public class TestingZone extends ActionBarActivity {
                 }
                 //Log.v(TAG, "Stage 2");
 
-                DataBaseWarper.checkUserExistance("HAHA");
+                //DataBaseWarper.checkUserExistance("HAHA");
                 //DataBaseWarper.getUsers();
-                //DataBaseWarper.addUser("Joe");
+
+                Log.v("HAHA", "Got: "+addUser("BLAKE"));
             }
         });
 
     }
 
+    private static int addUser(String s){
+        funcAddUser f = new funcAddUser();
+        f.execute(s);
+
+        while(f.ret ==0);
+
+        return f.ret;
+    }
+
+    public static class funcAddUser extends AsyncTask<String, Integer, Integer>{
+        Connection conn;
+        Boolean done = false;
+        int ret = 0;
+
+            /*
+            protected funcAddUser(){
+                super();
+                done = false;
+            }
+            */
+
+        protected Integer doInBackground(String... in){
+            conn = connectToDataBase();
+
+            ret = getFunction(conn, "adduser", in[0]);
+
+            return 0;
+        }
+
+        protected static Integer getFunction(Connection conn, String fname, String... in){
+            final String TAG = "getFunc";
+
+            if (conn == null){
+                Log.e(TAG, "Connection was null");
+                return null;
+            }
+
+
+            String sql;
+            sql = "SELECT \"" + fname + "\" (";
+
+            for (String s : in)
+                sql += "'" + s + "',";
+
+            if(sql.charAt(sql.length()-1)==',')
+                sql = sql.substring(0,sql.length()-1);
+
+            sql += ");";
+
+            Log.v(TAG, sql);
+
+            int res = 0;
+            Statement st = null;
+            try {
+                st = conn.createStatement();
+                ResultSet rs = null;
+                rs = st.executeQuery(sql);
+
+                while(rs.next()){
+                    res = rs.getInt(fname);
+                    //Log.v(TAG, out.toString());
+                }
+
+                rs.close();
+                st.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+
+            return res;
+        }
+
+
+    }
+
+    final private static String url = "jdbc:postgresql://serenity.isozilla.com:5432/" +
+            "parcelexchange?sslfactory=org.postgresql.ssl.NonValidatingFactory" +
+            "&ssl=true";
+
+    protected static Connection connectToDataBase(){
+        Connection conn = null;
+
+        try {
+            conn = DriverManager. getConnection(url, "parcelexchange", "Mabc0NDkYRf1yVyIfhRd");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (conn == null)
+            Log.e("connectToDataBase", "Connection was null");
+
+        return conn;
+    }
 
     private static class DataBaseWarper{
-        final private static String url = "jdbc:postgresql://serenity.isozilla.com:5432/" +
-                "parcelexchange?sslfactory=org.postgresql.ssl.NonValidatingFactory" +
-                "&ssl=true";
 
         public static void checkUserExistance(String name){
             new get().execute(new getStrings("users", "username", "username = '" + name + "';"));
@@ -103,6 +196,7 @@ public class TestingZone extends ActionBarActivity {
             public String column;
             public String values;
         }
+
 
         protected static class add extends AsyncTask<addStrings, Integer, Integer>{
             Connection conn;
@@ -199,21 +293,6 @@ public class TestingZone extends ActionBarActivity {
             }
 
             return res;
-        }
-
-        protected static Connection connectToDataBase(){
-            Connection conn = null;
-
-            try {
-                conn = DriverManager. getConnection(url, "parcelexchange", "Mabc0NDkYRf1yVyIfhRd");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            if (conn == null)
-                Log.e("connectToDataBase", "Connection was null");
-
-            return conn;
         }
 
     }
